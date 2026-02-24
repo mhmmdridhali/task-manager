@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard,
@@ -45,14 +46,13 @@ export default function Sidebar() {
     const NavContent = ({ isExpanded }: { isExpanded: boolean }) => (
         <div className="flex flex-col h-full bg-neo-white">
             {/* Logo */}
-            <div className={`p-4 flex items-center mb-2 h-16 border-b-[3px] border-neo-black ${isExpanded ? "justify-between" : "justify-center"}`}>
-                <Link href="/dashboard" className="font-heading text-2xl font-bold text-neo-black flex items-center min-w-0">
-                    {isExpanded ? (
-                        <>Taskly<span className="text-neo-pink">.</span></>
-                    ) : (
-                        <span className="text-xl">T<span className="text-neo-pink">.</span></span>
-                    )}
-                </Link>
+            <div className={`p-4 flex items-center mb-2 h-16 border-b-[3px] border-neo-black ${isExpanded ? "justify-start gap-2" : "justify-center"}`}>
+                <Image src="/logo.svg" alt="Taskly Logo" width={isExpanded ? 28 : 32} height={isExpanded ? 28 : 32} className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)] flex-shrink-0" />
+                {isExpanded && (
+                    <Link href="/dashboard" className="font-heading text-2xl font-bold text-neo-black flex items-center min-w-0">
+                        Taskly<span className="text-neo-pink">.</span>
+                    </Link>
+                )}
             </div>
 
             {/* Navigation */}

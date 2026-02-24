@@ -193,12 +193,12 @@ export default function DashboardPage() {
                     <p className="font-sans text-sm text-neo-black/40" suppressHydrationWarning>
                         {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
                     </p>
-                    <h1 className="font-heading text-3xl sm:text-4xl font-bold text-neo-black mb-1 flex items-center gap-2">
-                        {getGreeting()},{" "}
+                    <h1 className="font-heading text-3xl sm:text-4xl font-bold text-neo-black mb-1 flex flex-wrap items-baseline gap-x-2">
+                        <span>{getGreeting()},</span>
                         {isLoadingAuth ? (
                             <Loader2 size={24} className="animate-spin text-neo-pink" />
                         ) : (
-                            <span className="text-neo-pink truncate max-w-[200px] inline-block align-bottom">{userName}</span>
+                            <span className="text-neo-pink truncate max-w-[70vw] sm:max-w-[300px]">{userName}</span>
                         )}
                     </h1>
                     <p className="font-sans text-base text-neo-black/50">{getMotivation(activeCount)}</p>
@@ -218,12 +218,10 @@ export default function DashboardPage() {
                         <p className="font-heading text-2xl font-bold text-neo-black">{completedCount}</p>
                         <p className="font-sans text-[10px] font-bold text-neo-black/60 uppercase tracking-wider">Selesai</p>
                     </div>
-                    {overdueTasks.length > 0 && (
-                        <div className="px-4 py-3 neo-border bg-neo-red/30 neo-shadow-sm text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default">
-                            <p className="font-heading text-2xl font-bold text-neo-black">{overdueTasks.length}</p>
-                            <p className="font-sans text-[10px] font-bold text-neo-black/60 uppercase tracking-wider">Terlambat</p>
-                        </div>
-                    )}
+                    <div className={`px-4 py-3 neo-border neo-shadow-sm text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default ${overdueTasks.length > 0 ? "bg-neo-red/30 animate-pulse" : "bg-neo-gray/30"}`}>
+                        <p className="font-heading text-2xl font-bold text-neo-black">{overdueTasks.length}</p>
+                        <p className="font-sans text-[10px] font-bold text-neo-black/60 uppercase tracking-wider">Terlambat</p>
+                    </div>
                 </div>
             </div>
 

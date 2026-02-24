@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Background Shadow -->
+  <rect x="8" y="8" width="50" height="50" rx="8" fill="#000000" />
+  
+  <!-- Main Rectangle (Pink) -->
+  <rect x="4" y="4" width="50" height="50" rx="8" fill="#F472B6" stroke="#000000" stroke-width="4" />
+  
+  <!-- Letter T Main (White) -->
+  <path d="M 18 16 L 40 16 L 40 24 L 33 24 L 33 46 L 25 46 L 25 24 L 18 24 Z" fill="#ffffff" stroke="#000000" stroke-width="3" stroke-linejoin="round" />
+</svg>

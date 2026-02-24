@@ -1,0 +1,225 @@
+@import "tailwindcss";
+
+/* ========================================
+   NEOBRUTALISM DESIGN SYSTEM
+   ======================================== */
+
+:root {
+  /* Core Neobrutalism Palette */
+  --neo-yellow: #FFD54F;
+  --neo-cyan: #4DD0E1;
+  --neo-pink: #F48FB1;
+  --neo-green: #81C784;
+  --neo-orange: #FFB74D;
+  --neo-purple: #CE93D8;
+  --neo-red: #EF5350;
+
+  /* Neutrals */
+  --neo-bg: #FFF8F0;
+  --neo-black: #1A1A1A;
+  --neo-white: #FFFFFF;
+  --neo-gray: #F5F0EB;
+
+  /* Borders & Shadows */
+  --neo-border-width: 3px;
+  --neo-shadow-sm: 3px 3px 0px 0px var(--neo-black);
+  --neo-shadow: 4px 4px 0px 0px var(--neo-black);
+  --neo-shadow-lg: 6px 6px 0px 0px var(--neo-black);
+}
+
+
+@theme inline {
+  --color-background: var(--neo-bg);
+  --color-foreground: var(--neo-black);
+  --color-neo-yellow: var(--neo-yellow);
+  --color-neo-cyan: var(--neo-cyan);
+  --color-neo-pink: var(--neo-pink);
+  --color-neo-green: var(--neo-green);
+  --color-neo-orange: var(--neo-orange);
+  --color-neo-purple: var(--neo-purple);
+  --color-neo-red: var(--neo-red);
+  --color-neo-bg: var(--neo-bg);
+  --color-neo-black: var(--neo-black);
+  --color-neo-white: var(--neo-white);
+  --color-neo-gray: var(--neo-gray);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
+}
+
+/* Base Styles */
+body {
+  background: var(--neo-bg);
+  color: var(--neo-black);
+  font-family: var(--font-body);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading);
+}
+
+/* ========================================
+   NEOBRUTALISM UTILITY CLASSES
+   ======================================== */
+
+.neo-border {
+  border: var(--neo-border-width) solid var(--neo-black);
+}
+
+.neo-shadow {
+  box-shadow: var(--neo-shadow);
+}
+
+.neo-shadow-sm {
+  box-shadow: var(--neo-shadow-sm);
+}
+
+.neo-shadow-lg {
+  box-shadow: var(--neo-shadow-lg);
+}
+
+/* Pressed / Active state helper */
+.neo-pressed {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+.neo-pressed-sm {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+/* Selection styling */
+::selection {
+  background: var(--neo-yellow);
+  color: var(--neo-black);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-12px) rotate(2deg);
+  }
+}
+
+@keyframes floatAlt {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(-3deg);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  70% {
+    transform: scale(0.95);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes slideOut {
+  to {
+    opacity: 0;
+    transform: translateX(80px);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out both;
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-alt {
+  animation: floatAlt 5s ease-in-out infinite;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.5s ease-out both;
+}
+
+.animate-slide-out {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Task completed text styling */
+.task-completed {
+  text-decoration: line-through;
+  text-decoration-thickness: 3px;
+  text-decoration-color: var(--neo-black);
+  opacity: 0.5;
+  transition: all 0.3s ease;
+}
+
+/* Neo checkbox */
+.neo-checkbox {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--neo-black);
+  background: var(--neo-white);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.neo-checkbox:checked {
+  background: var(--neo-green);
+}
+
+.neo-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--neo-black);
+}

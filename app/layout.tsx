@@ -18,6 +18,11 @@ export const metadata: Metadata = {
   title: "Taskly — To-Do List Neobrutalism",
   description:
     "Aplikasi manajemen tugas personal yang fun, playful, dan produktif.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

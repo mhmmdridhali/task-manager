@@ -3,9 +3,10 @@
 import { create } from "zustand";
 import type { Task, Filter, SortOption, Priority, Category } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
+import { getLocalTodayStr } from "@/lib/dateUtils";
 
 function todayStr() {
-    return new Date().toISOString().split("T")[0];
+    return getLocalTodayStr();
 }
 
 // Ensure the local ID temporarily looks like a UUID for UI consistency until DB replaces it

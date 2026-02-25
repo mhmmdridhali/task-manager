@@ -11,6 +11,7 @@ import CalendarWidget from "@/components/CalendarWidget";
 import NeoCard from "@/components/ui/NeoCard";
 import NeoButton from "@/components/ui/NeoButton";
 import { createClient } from "@/lib/supabase/client";
+import { getLocalTodayStr } from "@/lib/dateUtils";
 
 function getGreeting(): string {
     const h = new Date().getHours();
@@ -37,7 +38,7 @@ function AddTaskModal({ isOpen, onClose, onAdd }: {
     const [title, setTitle] = useState("");
     const [priority, setPriority] = useState<Priority>("medium");
     const [categoryId, setCategoryId] = useState("");
-    const [dueDate, setDueDate] = useState(() => new Date().toISOString().split("T")[0]);
+    const [dueDate, setDueDate] = useState(() => getLocalTodayStr());
     const { categories } = useTaskStore();
 
     if (!isOpen) return null;
@@ -47,7 +48,7 @@ function AddTaskModal({ isOpen, onClose, onAdd }: {
         if (!t || !dueDate) return;
         onAdd(t, priority, categoryId || undefined, dueDate);
         setTitle(""); setPriority("medium"); setCategoryId("");
-        setDueDate(new Date().toISOString().split("T")[0]);
+        setDueDate(getLocalTodayStr());
         onClose();
     };
 
@@ -131,7 +132,7 @@ export default function DashboardPage() {
         fetchTasks();
     }, [supabase, fetchTasks]);
 
-    const todayStr = new Date().toISOString().split("T")[0];
+    const todayStr = getLocalTodayStr();
 
     // Today's tasks: active tasks due today/overdue/no-due, or filtered by calendar date
     const todayTasks = useMemo(() => {

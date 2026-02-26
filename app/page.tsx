@@ -243,8 +243,6 @@ export default function LandingPage() {
           ))}
         </motion.div>
 
-        {/* Live User Counter */}
-        <LiveStats />
       </header>
 
       {/* Features Section */}
@@ -327,12 +325,16 @@ export default function LandingPage() {
             ))}
           </div>
 
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.3 }} className="text-center mt-16">
-            <Link href="/auth">
-              <NeoButton variant="yellow" className="text-xl px-12 py-5 shadow-[4px_4px_0px_0px_var(--neo-black)] hover:shadow-[6px_6px_0px_0px_var(--neo-black)] hover:-translate-y-1 hover:-translate-x-1">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.3 }} className="mt-16 flex flex-col sm:flex-row items-stretch justify-center gap-4">
+            <Link href="/auth" className="flex-1 max-w-[400px]">
+              <NeoButton variant="yellow" className="text-xl px-12 py-5 shadow-[4px_4px_0px_0px_var(--neo-black)] hover:shadow-[6px_6px_0px_0px_var(--neo-black)] hover:-translate-y-1 hover:-translate-x-1 w-full h-full flex items-center justify-center">
                 Cobain Sekarang, Gratis! <ArrowRight size={24} strokeWidth={3} className="ml-2 inline animate-pulse" />
               </NeoButton>
             </Link>
+            {/* Live User Counter — placed at bottom beside CTA so it has time to load */}
+            <div className="flex-1 max-w-[280px]">
+              <LiveStats />
+            </div>
           </motion.div>
         </div>
       </section>

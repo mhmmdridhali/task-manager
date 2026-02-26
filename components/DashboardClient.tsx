@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { CalendarDays, CheckCircle2, Flame, Clock, ArrowRight, Plus, X, ChevronDown, Calendar, Loader2, Pencil, Trash2, Check } from "lucide-react";
 import Link from "next/link";
 import type { Task, Priority } from "@/lib/types";
@@ -12,6 +12,52 @@ import NeoCard from "@/components/ui/NeoCard";
 import NeoButton from "@/components/ui/NeoButton";
 import { createClient } from "@/lib/supabase/client";
 import { getLocalTodayStr } from "@/lib/dateUtils";
+
+// --- Retro Digital Clock ---
+function RetroDigitalClock() {
+    const [time, setTime] = useState<string | null>(null);
+
+    useEffect(() => {
+        const formatTime = () => {
+            const now = new Date();
+            return now.toLocaleTimeString("id-ID", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: false,
+            });
+        };
+
+        setTime(formatTime());
+        const interval = setInterval(() => setTime(formatTime()), 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="flex-1 px-4 py-3 neo-border bg-neo-yellow neo-shadow-sm flex items-center justify-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default" suppressHydrationWarning>
+            <p className="font-mono text-2xl font-bold text-neo-black tracking-[0.15em] tabular-nums" suppressHydrationWarning>
+                {time ?? "--:--:--"}
+            </p>
+        </div>
+    );
+}
+
+// --- Retro Date Card ---
+function RetroDateCard() {
+    const [day, setDay] = useState<string | null>(null);
+
+    useEffect(() => {
+        setDay(new Date().toLocaleDateString("id-ID", { weekday: "long" }));
+    }, []);
+
+    return (
+        <div className="flex-1 px-4 py-3 neo-border bg-neo-pink neo-shadow-sm flex items-center justify-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default" suppressHydrationWarning>
+            <p className="font-heading text-2xl font-bold text-neo-black" suppressHydrationWarning>
+                {day ?? "---"}
+            </p>
+        </div>
+    );
+}
 
 function getGreeting(): string {
     const h = new Date().getHours();
@@ -107,7 +153,7 @@ function AddTaskModal({ isOpen, onClose, onAdd }: {
 }
 
 export default function DashboardPage() {
-    const { tasks, toggleTask, addTask, editTask, deleteTask, restoreTask, activeCount, completedCount, fetchTasks, categories } = useTaskStore();
+    const { tasks, toggleTask, addTask, editTask, deleteTask, restoreTask, activeCount, completedCount, fetchTasks, fetchCategories, categories } = useTaskStore();
     const { addToast } = useToast();
     const [calendarDate, setCalendarDate] = useState<string | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -130,15 +176,19 @@ export default function DashboardPage() {
         };
         fetchUser();
         fetchTasks();
-    }, [supabase, fetchTasks]);
+        fetchCategories();
+    }, [supabase, fetchTasks, fetchCategories]);
 
     const todayStr = getLocalTodayStr();
 
     // Today's tasks: active tasks due today/overdue/no-due, or filtered by calendar date
+    const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
     const todayTasks = useMemo(() => {
         const active = tasks.filter((t) => !t.completed);
-        if (calendarDate) return active.filter((t) => t.dueDate === calendarDate);
-        return active.filter((t) => !t.dueDate || t.dueDate <= todayStr);
+        const filtered = calendarDate
+            ? active.filter((t) => t.dueDate === calendarDate)
+            : active.filter((t) => !t.dueDate || t.dueDate <= todayStr);
+        return [...filtered].sort((a, b) => (PRIORITY_ORDER[a.priority] ?? 1) - (PRIORITY_ORDER[b.priority] ?? 1));
     }, [tasks, todayStr, calendarDate]);
 
     const overdueTasks = useMemo(() =>
@@ -154,7 +204,10 @@ export default function DashboardPage() {
 
     const handleAddTask = (title: string, priority: Priority, categoryId?: string, dueDate?: string) => {
         addTask(title, priority, categoryId, dueDate);
-        addToast("Tugas baru ditambahkan!", "success");
+        const now = new Date();
+        const createdAtStr = now.toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" })
+            + " " + now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+        addToast(`Tugas baru ditambahkan! (dibuat: ${createdAtStr})`, "success");
     };
 
     const handleToggleTask = (task: Task) => {
@@ -189,11 +242,9 @@ export default function DashboardPage() {
     return (
         <main className="p-6 md:p-10 max-w-7xl mx-auto w-full">
             {/* Header */}
-            <div className="mb-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-                <div>
-                    <p className="font-sans text-sm text-neo-black/40" suppressHydrationWarning>
-                        {new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
-                    </p>
+            <div className="mb-8 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+                {/* Left: Greeting + Progress */}
+                <div className="flex-1 order-1">
                     <h1 className="font-heading text-3xl sm:text-4xl font-bold text-neo-black mb-1 flex flex-wrap items-baseline gap-x-2">
                         <span>{getGreeting()},</span>
                         {isLoadingAuth ? (
@@ -202,26 +253,44 @@ export default function DashboardPage() {
                             <span className="text-neo-pink truncate max-w-[70vw] sm:max-w-[300px]">{userName}</span>
                         )}
                     </h1>
-                    <p className="font-sans text-base text-neo-black/50">{getMotivation(activeCount)}</p>
+                    <p className="font-sans text-base text-neo-black/50 mb-4">{getMotivation(activeCount)}</p>
+                    {/* Progress Bar */}
+                    <div className="neo-border neo-shadow-sm bg-neo-white p-3">
+                        <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-heading text-xs font-bold text-neo-black uppercase tracking-wider">Progress Hari Ini</h3>
+                            <span className="font-heading text-xs font-bold text-neo-black">
+                                {todayTotal > 0 ? `${todayDone}/${todayTotal} — ${todayPct}%` : "Belum ada tugas"}
+                            </span>
+                        </div>
+                        <div className="neo-border bg-neo-gray overflow-hidden h-4 rounded-sm">
+                            <div
+                                className="h-full bg-neo-green transition-all duration-700 ease-out"
+                                style={{ width: `${todayTotal > 0 ? todayPct : 0}%` }}
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div className="flex gap-3">
-                    {/* Add Task button */}
-                    <button onClick={() => setShowAddModal(true)}
-                        className="px-4 py-3 neo-border bg-neo-cyan neo-shadow-sm hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_var(--neo-black)] transition-all cursor-pointer flex items-center gap-2">
-                        <Plus size={18} strokeWidth={3} />
-                        <span className="font-heading font-bold text-sm">Tambah</span>
-                    </button>
-                    <div className="px-4 py-3 neo-border bg-neo-yellow neo-shadow-sm text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default">
-                        <p className="font-heading text-2xl font-bold text-neo-black">{activeCount}</p>
-                        <p className="font-sans text-[10px] font-bold text-neo-black/60 uppercase tracking-wider">Aktif</p>
+                {/* Right: Two rows of cards — same width as calendar */}
+                <div className="lg:w-72 flex-shrink-0 flex flex-col gap-3 order-2">
+                    {/* Date + Clock row (mobile: order-3) */}
+                    <div className="flex gap-3">
+                        <RetroDateCard />
+                        <RetroDigitalClock />
                     </div>
-                    <div className="px-4 py-3 neo-border bg-neo-green neo-shadow-sm text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default">
-                        <p className="font-heading text-2xl font-bold text-neo-black">{completedCount}</p>
-                        <p className="font-sans text-[10px] font-bold text-neo-black/60 uppercase tracking-wider">Selesai</p>
-                    </div>
-                    <div className={`px-4 py-3 neo-border neo-shadow-sm text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default ${overdueTasks.length > 0 ? "bg-neo-red/30 animate-pulse" : "bg-neo-gray/30"}`}>
-                        <p className="font-heading text-2xl font-bold text-neo-black">{overdueTasks.length}</p>
-                        <p className="font-sans text-[10px] font-bold text-neo-black/60 uppercase tracking-wider">Terlambat</p>
+                    {/* Score cards row (mobile: order-4) */}
+                    <div className="flex gap-3">
+                        <div className="flex-1 px-4 py-3 neo-border bg-neo-orange neo-shadow-sm text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default">
+                            <p className="font-heading text-2xl font-bold text-neo-black">{activeCount}</p>
+                            <p className="font-sans text-[10px] font-bold text-neo-black/60 uppercase tracking-wider">Aktif</p>
+                        </div>
+                        <div className="flex-1 px-4 py-3 neo-border bg-neo-green neo-shadow-sm text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default">
+                            <p className="font-heading text-2xl font-bold text-neo-black">{completedCount}</p>
+                            <p className="font-sans text-[10px] font-bold text-neo-black/60 uppercase tracking-wider">Selesai</p>
+                        </div>
+                        <div className={`flex-1 px-4 py-3 neo-border neo-shadow-sm text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default ${overdueTasks.length > 0 ? "bg-neo-red/30 animate-pulse" : "bg-neo-gray/30"}`}>
+                            <p className="font-heading text-2xl font-bold text-neo-black">{overdueTasks.length}</p>
+                            <p className="font-sans text-[10px] font-bold text-neo-black/60 uppercase tracking-wider">Terlambat</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -233,11 +302,16 @@ export default function DashboardPage() {
                             <Flame size={20} strokeWidth={2.5} />
                             {calendarDate ? "Tugas di Tanggal Ini" : "Tugas Hari Ini"}
                         </h2>
-                        <Link href="/dashboard/board">
-                            <NeoButton variant="white" className="text-xs px-3 py-1.5">
-                                Lihat Semua <ArrowRight size={12} strokeWidth={3} className="inline ml-1" />
+                        <div className="flex items-center gap-2">
+                            <NeoButton variant="cyan" className="text-xs px-3 py-1.5" onClick={() => setShowAddModal(true)}>
+                                <Plus size={12} strokeWidth={3} className="inline mr-1" /> Tambah
                             </NeoButton>
-                        </Link>
+                            <Link href="/dashboard/board">
+                                <NeoButton variant="white" className="text-xs px-3 py-1.5">
+                                    Lihat Semua <ArrowRight size={12} strokeWidth={3} className="inline ml-1" />
+                                </NeoButton>
+                            </Link>
+                        </div>
                     </div>
 
                     {overdueTasks.length > 0 && !calendarDate && (
@@ -336,19 +410,9 @@ export default function DashboardPage() {
                     )}
                 </div>
 
-                {/* Sidebar: Calendar + Progress */}
+                {/* Sidebar: Calendar only (Progress moved to header) */}
                 <div className="lg:w-72 flex-shrink-0">
                     <CalendarWidget tasks={tasks} selectedDate={calendarDate} onSelectDate={setCalendarDate} />
-                    <NeoCard color="white" className="p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-[4px_4px_0_0_var(--neo-black)] cursor-default">
-                        <h3 className="font-heading text-sm font-bold text-neo-black mb-3">Progress Hari Ini</h3>
-                        <div className="neo-border bg-neo-gray overflow-hidden h-6 mb-2">
-                            <div className="h-full bg-neo-green flex items-center justify-center transition-all duration-500"
-                                style={{ width: `${todayTotal > 0 ? Math.max(todayPct, 8) : 8}%` }}>
-                                <span className="font-heading text-[10px] font-bold text-neo-black px-2">{todayDone}/{todayTotal}</span>
-                            </div>
-                        </div>
-                        <p className="font-sans text-[11px] text-neo-black/40">{todayTotal > 0 ? `${todayPct}% tercapai` : "Belum ada tugas"}</p>
-                    </NeoCard>
                 </div>
             </div>
 

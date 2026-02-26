@@ -45,7 +45,7 @@ export default function SettingsPage() {
         // Optionally update the profiles table if RLS permits
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-            await supabase.from('profiles').update({ name: userName }).eq('id', user.id);
+            await supabase.from('profiles').update({ display_name: userName }).eq('id', user.id);
         }
 
         setIsSaving(false);

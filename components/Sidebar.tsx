@@ -18,11 +18,12 @@ import {
 import { createClient } from "@/lib/supabase/client";
 
 // Assign specific colors for hover states to each menu item
+// NOTE: hoverClass must be a full static string so Tailwind JIT can detect and generate it
 const menuItems = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, hoverColor: "bg-neo-yellow" },
-    { href: "/dashboard/board", label: "Kanban Board", icon: Columns3, hoverColor: "bg-neo-cyan" },
-    { href: "/dashboard/categories", label: "Kategori", icon: Tag, hoverColor: "bg-neo-pink" },
-    { href: "/dashboard/settings", label: "Pengaturan", icon: Settings, hoverColor: "bg-neo-green" },
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, hoverColor: "bg-neo-yellow", hoverClass: "hover:bg-neo-yellow" },
+    { href: "/dashboard/board", label: "Kanban Board", icon: Columns3, hoverColor: "bg-neo-cyan", hoverClass: "hover:bg-neo-cyan" },
+    { href: "/dashboard/categories", label: "Kategori", icon: Tag, hoverColor: "bg-neo-pink", hoverClass: "hover:bg-neo-pink" },
+    { href: "/dashboard/settings", label: "Pengaturan", icon: Settings, hoverColor: "bg-neo-green", hoverClass: "hover:bg-neo-green" },
 ];
 
 export default function Sidebar() {
@@ -69,7 +70,7 @@ export default function Sidebar() {
                             title={!isExpanded ? item.label : undefined}
                             className={`flex items-center ${isExpanded ? "px-4 justify-start" : "justify-center px-0"} py-3 neo-border font-heading font-bold text-sm transition-all duration-200 cursor-pointer overflow-hidden whitespace-nowrap group hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] active:shadow-none ${active
                                 ? `${item.hoverColor} shadow-none translate-x-[2px] translate-y-[2px]`
-                                : `bg-neo-white neo-shadow-sm hover:${item.hoverColor}`
+                                : `bg-neo-white neo-shadow-sm ${item.hoverClass}`
                                 }`}
                         >
                             <div className="flex items-center justify-center w-6 h-6 flex-shrink-0 group-hover:scale-110 transition-transform">

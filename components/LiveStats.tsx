@@ -18,17 +18,15 @@ export default function LiveStats() {
     }, []);
 
     return (
-        <div className="flex justify-center mt-10">
-            <div className="flex items-center gap-3 px-5 py-3 neo-border neo-shadow-sm bg-neo-white hover:-translate-y-1 transition-transform">
-                <div className="p-2 bg-neo-cyan neo-border">
-                    <Users size={20} strokeWidth={2.5} className="text-neo-black" />
-                </div>
-                <div>
-                    <p className={`font-heading font-bold text-2xl text-neo-black tabular-nums transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}>
-                        {userCount.toLocaleString("id-ID")}+
-                    </p>
-                    <p className="font-sans text-xs text-neo-black/50 font-medium">Pengguna Terdaftar</p>
-                </div>
+        <div className="flex items-center gap-3 px-5 py-3 neo-border neo-shadow-sm bg-neo-white hover:-translate-y-1 transition-transform h-full w-full justify-center">
+            <div className="p-2 bg-neo-cyan neo-border">
+                <Users size={20} strokeWidth={2.5} className="text-neo-black" />
+            </div>
+            <div className="text-left">
+                <p className={`font-heading font-bold text-2xl text-neo-black tabular-nums transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}>
+                    {userCount.toLocaleString("id-ID")}+
+                </p>
+                <p className="font-sans text-xs text-neo-black/50 font-medium">Pengguna Terdaftar</p>
             </div>
         </div>
     );
